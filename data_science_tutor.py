@@ -165,21 +165,40 @@ def main():
     if "messages" not in st.session_state:
         st.session_state.messages = []
     
-    # Check for API key
-    if 'GOOGLE_API_KEY' not in st.session_state:
+    # Get API key from secrets management
+    try:
+        api_key = st.secrets["API_KEY"]
+        has_api_key = True
+    except (KeyError, FileNotFoundError):
+        has_api_key = False
+    
+    # Handle API key (from secrets or user input)
+    if not has_api_key:
         with st.sidebar:
+            st.warning("API key not found in secrets. Please enter your Google API Key.")
             api_key = st.text_input("Enter your Google API Key:", type="password")
-            if api_key:
-                st.session_state['GOOGLE_API_KEY'] = api_key
-                st.success("API Key saved successfully!")
-                # Initialize memory and tutor
-                if 'memory' not in st.session_state:
-                    st.session_state.memory = ConversationMemory()
-                if 'tutor' not in st.session_state:
-                    st.session_state.tutor = DataScienceTutor(api_key, st.session_state.memory)
-            else:
-                st.warning("Please enter your Google API Key to use the application")
+            if not api_key:
+                st.error("API Key is required to use this application")
+                st.info("""
+                To set up your API key in Streamlit secrets:
+                
+                1. Local development: Create a file `.streamlit/secrets.toml` with:
+                   ```
+                   GOOGLE_API_KEY = "your-api-key"
+                   ```
+                
+                2. Streamlit Cloud: Add the GOOGLE_API_KEY to your app secrets
+                   in the Streamlit Cloud dashboard.
+                """)
                 st.stop()
+    
+    # Initialize memory and tutor
+    if 'memory' not in st.session_state:
+        st.session_state.memory = ConversationMemory()
+    
+    if 'tutor' not in st.session_state or 'api_key' not in st.session_state or st.session_state.api_key != api_key:
+        st.session_state.tutor = DataScienceTutor(api_key, st.session_state.memory)
+        st.session_state.api_key = api_key
     
     # App interface
     st.title("📊 Data Science AI Tutor")
