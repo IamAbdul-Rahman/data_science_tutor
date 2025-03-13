@@ -3,26 +3,15 @@ import google.generativeai as genai
 from datetime import datetime
 
 class ConversationMemory:
-    """
-    Handles storing and retrieving conversation history
-    """
-    
     def __init__(self, max_history=20):
         """
-        Initialize the conversation memory
-        
-        Args:
-            max_history (int): Maximum number of exchanges to keep in memory
+        Maximum number of exchanges to keep in memory
         """
         self.max_history = max_history
     
     def add_exchange(self, user_message, assistant_response):
         """
         Add a new exchange to the conversation history
-        
-        Args:
-            user_message (str): The user's message
-            assistant_response (str): The assistant's response
         """
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
@@ -33,32 +22,22 @@ class ConversationMemory:
             "assistant": assistant_response
         })
         
-        # Trim history if it exceeds max_history
+        # Trim history
         if len(st.session_state.chat_history) > self.max_history:
             st.session_state.chat_history = st.session_state.chat_history[-self.max_history:]
     
     def get_conversation_history(self):
-        """
-        Get the current conversation history
-        
-        Returns:
-            list: List of conversation exchanges
-        """
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
         
         return st.session_state.chat_history
     
     def clear(self):
-        """Clear the conversation history"""
         st.session_state.chat_history = []
         
     def format_for_prompt(self):
         """
-        Format the conversation history for inclusion in a prompt
-        
-        Returns:
-            str: Formatted conversation history
+        Formatted conversation history
         """
         history = self.get_conversation_history()
         formatted_history = ""
@@ -70,33 +49,15 @@ class ConversationMemory:
         return formatted_history
 
 class DataScienceTutor:
-    """
-    Data Science Tutor powered by Gemini 1.5 Pro
-    """
-    
     def __init__(self, api_key, memory=None):
-        """
-        Initialize the tutor
-        
-        Args:
-            api_key (str): Google API key
-            memory (ConversationMemory, optional): Memory instance
-        """
         self.api_key = api_key
         self.memory = memory if memory else ConversationMemory()
         self.configure_genai()
         
     def configure_genai(self):
-        """Configure the Google Generative AI client"""
         genai.configure(api_key=self.api_key)
         
     def get_system_prompt(self):
-        """
-        Get the system prompt for the tutor
-        
-        Returns:
-            str: System prompt
-        """
         return """
         You are a helpful and knowledgeable Data Science Tutor. Your purpose is to assist users with their data science related questions and problems.
 
@@ -114,12 +75,6 @@ class DataScienceTutor:
     def generate_response(self, user_message):
         """
         Generate a response to the user's message
-        
-        Args:
-            user_message (str): User's message
-            
-        Returns:
-            str: Assistant's response
         """
         try:
             # Get conversation history
@@ -152,9 +107,9 @@ class DataScienceTutor:
             return f"Error generating response: {str(e)}"
 
 
-# Streamlit UI Implementation
+# Streamlit UI
 def main():
-    # Set page configuration
+    # page configuration
     st.set_page_config(
         page_title="Data Science AI Tutor",
         page_icon="📊",
@@ -165,14 +120,14 @@ def main():
     if "messages" not in st.session_state:
         st.session_state.messages = []
     
-    # Get API key from secrets management
+    # API key 
     try:
         api_key = st.secrets["API_KEY"]
         has_api_key = True
     except (KeyError, FileNotFoundError):
         has_api_key = False
     
-    # Handle API key (from secrets or user input)
+
     if not has_api_key:
         with st.sidebar:
             st.warning("API key not found in secrets. Please enter your Google API Key.")
