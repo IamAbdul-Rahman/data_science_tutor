@@ -186,17 +186,17 @@ def main():
             # Update the conversation memory
             st.session_state.memory.add_exchange(user_query, response)
             
-            # Display the response
+            # response
             message_placeholder.markdown(response)
             
-            # Add assistant response to messages for display
+            # assistant response to messages for display
             st.session_state.messages.append({"role": "assistant", "content": response})
     
     # Add a sidebar with information
     with st.sidebar:
         st.header("About this Tutor")
         st.info("""
-        This Data Science Tutor uses Gemini 1.5 Pro to answer your data science questions.
+        Data Science AI Tutor is powered by Google's Gemini 1.5 Pro model and designed to help you learn data scienceconcepts and solve related problems.
         
         **Topics you can ask about:**
         - Machine Learning algorithms
