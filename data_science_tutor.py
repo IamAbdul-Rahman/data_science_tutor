@@ -82,7 +82,7 @@ class DataScienceTutor:
             
             # Create the model
             model = genai.GenerativeModel(
-                model_name="gemini-1.5-pro",
+                model_name="gemini-2.5-pro",
                 generation_config={
                     "temperature": 0.2,
                     "top_p": 0.95,
